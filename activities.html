@@ -14,7 +14,6 @@
                 <span class="cmu">CMU</span> CREATE <span class="ai">AI</span>
             </div>
         </a>
-        <button id="btn-learn-more" class="btn-secondary" style="margin-left: auto; margin-right: 2rem;">Learn More 🧠</button>
     </header>
 
     <div class="app-container">
@@ -39,7 +38,10 @@
         </aside>
 
         <main>
-            <h2 id="lesson-page-title" style="text-align: center; margin-top: 2rem; margin-bottom: 1rem; color: var(--cmu-dark);">Lesson 1: Next-Word Prediction</h2>
+            <div class="lesson-header-container">
+                <h2 id="lesson-page-title" class="lesson-page-title">Lesson 1: Next-Word Prediction</h2>
+                <button id="btn-learn-more" class="btn-secondary">Learn More 🧠</button>
+            </div>
             
             <!-- Lesson 1 -->
             <div id="lesson-1" class="lesson-view active">
@@ -379,10 +381,12 @@
         </div>
     </div>
 
-    <footer class="app-footer" style="background: white; padding: 1.5rem 2rem; border-top: 1px solid #EAEAEA; display: flex; justify-content: center; gap: 3rem; font-size: 1rem; margin-top: auto;">
-        <a href="about.html" class="footer-link" style="color: var(--cmu-dark); text-decoration: none; font-weight: 600;">About CREATE AI</a>
-        <a href="educators.html" class="footer-link" style="color: var(--cmu-dark); text-decoration: none; font-weight: 600;">For Educators</a>
-        <a href="creators.html" class="footer-link" style="color: var(--cmu-dark); text-decoration: none; font-weight: 600;">Creators & CMU CREATE Lab</a>
+    <footer class="app-footer">
+        <a href="about.html" class="footer-link">About CREATE AI</a>
+        <span class="footer-dot">•</span>
+        <a href="educators.html" class="footer-link">For Educators</a>
+        <span class="footer-dot">•</span>
+        <a href="creators.html" class="footer-link">Creators & CMU CREATE Lab</a>
     </footer>
 
     <script src="data.js"></script>

@@ -221,7 +221,7 @@ function renderPalette() {
         });
 
         div.addEventListener('click', () => {
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 1024 || 'ontouchstart' in window || navigator.maxTouchPoints > 0) {
                 handleWordDrop(opt.text, opt.source);
             }
         });
