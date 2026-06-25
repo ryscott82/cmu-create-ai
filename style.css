@@ -867,3 +867,101 @@ button:hover {
     font-weight: bold;
     font-size: 0.9rem;
 }
+
+/* --- Mobile Responsive Styles --- */
+
+.mobile-nav {
+    display: none;
+    width: 90%;
+    margin: 1rem auto;
+    padding: 10px;
+    font-size: 1rem;
+    font-family: var(--font-family);
+    border-radius: var(--radius);
+    border: 1px solid #ccc;
+    background-color: white;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .mobile-nav {
+        display: block;
+    }
+    
+    .app-container {
+        flex-direction: column;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    header button {
+        margin: 0 auto !important;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    h1, h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.2rem;
+    }
+
+    /* Lesson 1 */
+    .word-block {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    /* Lesson 2 */
+    .l2-container {
+        flex-direction: column;
+    }
+
+    /* Lesson 5 */
+    #content-5 {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .parrot-stats {
+        width: 100%;
+        padding: 1rem;
+    }
+
+    .prob-row {
+        gap: 0.5rem;
+    }
+
+    .prob-label {
+        width: 80px;
+        font-size: 0.8rem;
+    }
+    
+    .prob-val {
+        width: 35px;
+        font-size: 0.8rem;
+    }
+
+    /* Modals */
+    .modal {
+        width: 90%;
+        padding: 1.5rem;
+    }
+
+    .learn-more-modal {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}

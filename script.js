@@ -62,6 +62,35 @@ navItems.forEach(item => {
     });
 });
 
+const mobileNav = document.getElementById('mobile-nav');
+if (mobileNav) {
+    mobileNav.addEventListener('change', (e) => {
+        const targetId = e.target.value;
+        
+        // Update centered title
+        lessonPageTitle.textContent = e.target.options[e.target.selectedIndex].text;
+        
+        // Sync desktop sidebar state
+        navItems.forEach(nav => {
+            nav.classList.remove('active');
+            if (nav.getAttribute('data-target') === targetId) {
+                nav.classList.add('active');
+            }
+        });
+
+        // Switch views
+        lessonViews.forEach(view => {
+            if (view.id === targetId) {
+                view.classList.remove('hidden');
+            } else {
+                view.classList.add('hidden');
+            }
+        });
+        
+        overlay.classList.add('hidden');
+    });
+}
+
 // Lesson 1 Logic
 function initLesson1() {
     // Generate order: Index 0 is always first, then randomize the rest
@@ -189,6 +218,12 @@ function renderPalette() {
 
         div.addEventListener('dragend', e => {
             div.style.opacity = '1';
+        });
+
+        div.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                handleWordDrop(opt.text, opt.source);
+            }
         });
 
         wordPalette.appendChild(div);
