@@ -1,0 +1,869 @@
+:root {
+    --cmu-red: #C41230;
+    --cmu-dark: #222222;
+    --bg-color: #F4F7F6;
+    --card-bg: #FFFFFF;
+    --block-color: #4A90E2;
+    --block-color-2: #F39C12;
+    --block-color-3: #2ECC71;
+    --drop-bg: #EAEAEA;
+    --text-main: #333333;
+    --font-family: 'Outfit', sans-serif;
+    --radius: 12px;
+    --shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: var(--cmu-red);
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+    z-index: 10;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.logo .cmu {
+    background: white;
+    color: var(--cmu-red);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+.logo .ai {
+    color: #FFD166;
+}
+
+.subtitle {
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.app-container {
+    display: flex;
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.sidebar {
+    width: 250px;
+    background: white;
+    padding: 2rem 1rem;
+    border-right: 1px solid #EAEAEA;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+}
+
+.sidebar h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--cmu-dark);
+    padding-left: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.sidebar li:hover {
+    background: var(--bg-color);
+}
+
+.sidebar li.active {
+    background: #FFF0F2;
+    color: var(--cmu-red);
+    border-left: 4px solid var(--cmu-red);
+}
+
+main {
+    flex: 1;
+    padding: 2rem;
+}
+
+.lesson-view.hidden {
+    display: none;
+}
+
+.lesson-intro {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.lesson-intro h2 {
+    font-size: 2rem;
+    color: var(--cmu-dark);
+    margin-bottom: 0.5rem;
+}
+
+.lesson-intro p {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sentence-area, .prediction-area {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+h3 {
+    margin-bottom: 1rem;
+    color: var(--cmu-red);
+    font-size: 1.2rem;
+}
+
+.sentence-track {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 80px;
+    align-items: center;
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 2px dashed #CCC;
+}
+
+.word-block {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+}
+
+.word-block.fixed {
+    background-color: var(--cmu-dark);
+}
+
+.word-block.draggable {
+    cursor: grab;
+    background-color: var(--block-color);
+    position: relative;
+}
+.word-block.draggable:nth-child(2n) { background-color: var(--block-color-2); }
+.word-block.draggable:nth-child(3n) { background-color: var(--block-color-3); }
+
+.word-block.draggable:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.prob-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: var(--cmu-red);
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 800;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.drop-zone {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #888;
+    background-color: var(--drop-bg);
+    border: 2px dashed #AAA;
+    min-width: 150px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.drop-zone.active {
+    border-color: var(--cmu-red);
+    background-color: #FFF0F2;
+    color: var(--cmu-red);
+}
+
+.drop-zone.hover {
+    background-color: #FFE0E5;
+    transform: scale(1.05);
+}
+
+.word-palette {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    min-height: 60px;
+}
+
+/* Image Comparison Styles */
+.image-comparison {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.image-card {
+    background: white;
+    padding: 1rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: transform 0.2s;
+    width: 45%;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+}
+
+.image-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    object-fit: cover;
+    aspect-ratio: 1/1;
+    border: 1px solid #EAEAEA;
+}
+
+.image-card .btn-select {
+    width: 100%;
+    background: var(--block-color);
+}
+.image-card .btn-select:hover {
+    background: #357ABD;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    animation: fadeIn 0.4s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+.modal {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    animation: slideUp 0.4s forwards;
+}
+
+@keyframes slideUp {
+    to { transform: translateY(0); }
+}
+
+.lesson-intro h2 {
+    color: var(--cmu-red);
+    margin-top: 0;
+}
+
+.splash-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    min-height: 400px;
+}
+
+.splash-screen .lesson-intro {
+    max-width: 600px;
+    margin-bottom: 2rem;
+}
+
+.btn-start-lesson {
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(160, 15, 37, 0.3);
+}
+
+.btn-start-lesson:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(160, 15, 37, 0.4);
+}
+
+.user-prompt {
+    background-color: var(--block-color-2);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.modal h2 {
+    color: var(--cmu-red);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.final-sentence {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--cmu-dark);
+    margin-bottom: 1.5rem;
+    background: #F4F7F6;
+    padding: 1rem;
+    border-radius: 10px;
+    border-left: 5px solid var(--block-color-2);
+}
+
+.modal p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+button {
+    background: var(--cmu-red);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    font-family: var(--font-family);
+}
+
+button:hover {
+    background: #A00F25;
+    transform: translateY(-2px);
+}
+
+/* Lesson 3: Tic-Tac-Toe Styles */
+.tictactoe-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.system-prompt-container {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.prompt-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.prompt-input-group select {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: white;
+    cursor: pointer;
+}
+
+.game-board-area {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ttt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    background: var(--cmu-dark);
+    border: 5px solid var(--cmu-dark);
+    border-radius: 8px;
+}
+
+.ttt-cell {
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.ttt-cell:hover {
+    background: #F4F7F6;
+}
+
+.ttt-cell.preview {
+    background: #FFF0F2;
+    color: rgba(196, 18, 48, 0.5);
+}
+
+.ttt-cell.x {
+    color: var(--cmu-red);
+}
+
+.ttt-cell.o {
+    color: var(--block-color);
+}
+
+.ai-helper-area {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.helper-avatar {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.helper-bubble {
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: 12px;
+    position: relative;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: var(--cmu-dark);
+}
+
+.helper-bubble::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 10px 10px 10px;
+    border-style: solid;
+    border-color: transparent transparent var(--bg-color) transparent;
+}
+
+.btn-secondary {
+    background: var(--block-color-2);
+}
+.btn-secondary:hover {
+    background: #E67E22;
+}
+
+.btn-secondary:disabled {
+    background: #CCC;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary {
+    background: var(--block-color-3);
+}
+.btn-primary:hover {
+    background: #27AE60;
+}
+
+/* Lesson 4: The Rigid Rulebook Styles */
+.rulebook-container {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.image-area img {
+    max-width: 400px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.logic-area {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.static-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.tree-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+}
+
+.tree-node {
+    background: var(--bg-color);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tree-node.q-node {
+    background: var(--cmu-dark);
+    color: white;
+    width: 80%;
+}
+
+.tree-node.result-node {
+    background: #EAEAEA;
+    color: #888;
+    width: 100px;
+    font-size: 0.85rem;
+}
+
+.tree-node.result-node.final {
+    width: 120px;
+    font-size: 1rem;
+}
+
+.tree-node.active-result {
+    background: #FFF0F2;
+    color: var(--cmu-red);
+    border-color: var(--cmu-red);
+    transform: scale(1.05);
+}
+
+.tree-node.active-result-correct {
+    background: #E8F8F5;
+    color: var(--block-color-3);
+    border-color: var(--block-color-3);
+    transform: scale(1.05);
+}
+
+.tree-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--block-color);
+    background: white;
+    color: var(--block-color);
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.tree-btn:hover:not(:disabled) {
+    background: #EAF2F8;
+}
+
+.tree-btn.selected {
+    background: var(--block-color);
+    color: white;
+}
+
+.tree-btn.wrong {
+    background: var(--cmu-red);
+    color: white;
+    border-color: var(--cmu-red);
+}
+
+.tree-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.dimmed {
+    opacity: 0.3;
+}
+
+/* Lesson 5: The Parrot Trainer Styles */
+.turn-counter {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--cmu-dark);
+    background: white;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.sentence-progress {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0 1rem 0;
+}
+
+.word-box {
+    background: white;
+    border: 2px dashed #CCC;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #999;
+    min-width: 80px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.word-box.locked {
+    background: #E8F8F5;
+    border: 2px solid var(--block-color-3);
+    color: var(--block-color-3);
+}
+
+.word-box.active {
+    border: 2px solid var(--cmu-red);
+    color: var(--cmu-red);
+    animation: pulseBorder 1.5s infinite;
+}
+
+@keyframes pulseBorder {
+    0% { box-shadow: 0 0 0 0 rgba(160, 15, 37, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(160, 15, 37, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(160, 15, 37, 0); }
+}
+
+.parrot-container {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.parrot-visuals {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 350px;
+}
+
+#parrot-image {
+    max-width: 250px;
+    margin-bottom: 1.5rem;
+}
+
+.speech-bubble {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--cmu-dark);
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.15s ease-out;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+    display: block;
+    width: 0;
+}
+
+.parrot-buttons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.btn-reward, .btn-ignore {
+    flex: 1;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    font-size: 1rem;
+}
+
+.btn-reward {
+    background: #27AE60;
+    color: white;
+}
+
+.btn-reward:hover {
+    background: #219653;
+    transform: translateY(-2px);
+}
+
+.btn-ignore {
+    background: #E0E0E0;
+    color: #333;
+}
+
+.btn-ignore:hover {
+    background: #BDBDBD;
+    transform: translateY(-2px);
+}
+
+.btn-reward:disabled, .btn-ignore:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.parrot-stats {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 450px;
+}
+
+.parrot-stats h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--cmu-dark);
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.prob-row {
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.prob-label {
+    width: 160px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #555;
+    text-align: right;
+}
+
+.prob-bar-bg {
+    flex: 1;
+    height: 12px;
+    background: #EAEAEA;
+    border-radius: 6px;
+    position: relative;
+}
+
+.prob-threshold-marker {
+    position: absolute;
+    left: 85%;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background-color: var(--cmu-red);
+    z-index: 10;
+}
+
+.prob-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s ease-out;
+}
+
+.prob-val {
+    width: 45px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
