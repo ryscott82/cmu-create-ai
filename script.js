@@ -1,39 +1,45 @@
-let currentRoundIndex = 0;
-let lesson1Order = [];
-let currentSentence = [];
-let userChoices = []; // keep track of which arrays the user pulled words from
+// --- Lesson 1 Global State ---
+let currentRoundIndex = 0; // Tracks which sentence the user is currently building in Lesson 1
+let lesson1Order = []; // Stores the randomized order of Lesson 1 prompts so they are different each time
+let currentSentence = []; // Holds the current sequence of words the user has dragged into the sentence
+let userChoices = []; // Keeps track of whether the user selected correct, incorrect, or nonsense words
 
-const sentenceTrack = document.getElementById('sentence-track');
-const wordPalette = document.getElementById('word-palette');
-const overlay = document.getElementById('feedback-overlay');
-const btnRestart = document.getElementById('btn-restart');
-const modalSentence = document.getElementById('modal-sentence');
-const title = document.getElementById('modal-title');
-const explanation = document.getElementById('modal-explanation');
+// --- Global DOM Elements ---
+const sentenceTrack = document.getElementById('sentence-track'); // The container where the sentence is built
+const wordPalette = document.getElementById('word-palette'); // The container holding the draggable word options
+const overlay = document.getElementById('feedback-overlay'); // The dark background overlay for modals
+const btnRestart = document.getElementById('btn-restart'); // Button to restart a lesson round
+const modalSentence = document.getElementById('modal-sentence'); // The text display in the feedback modal
+const title = document.getElementById('modal-title'); // The title in the feedback modal
+const explanation = document.getElementById('modal-explanation'); // The explanatory text in the feedback modal
 
-// Navigation & State
-const navItems = document.querySelectorAll('#nav-list li');
-const lessonViews = document.querySelectorAll('.lesson-view');
-const lessonPageTitle = document.getElementById('lesson-page-title');
+// --- Navigation & Sidebar State ---
+const navItems = document.querySelectorAll('#nav-list li'); // All the lesson links in the sidebar
+const lessonViews = document.querySelectorAll('.lesson-view'); // All the main lesson content containers
+const lessonPageTitle = document.getElementById('lesson-page-title'); // The main header title for the page
 
+// --- Initialization Logic ---
+// Keeps track of which lessons have already been initialized so we don't reset them if the user switches back and forth
 const initializedLessons = {};
 
+// Handle clicking the "Start Activity" button on a lesson's splash screen
 document.querySelectorAll('.btn-start-lesson').forEach(btn => {
     btn.addEventListener('click', (e) => {
         const lessonNum = e.target.getAttribute('data-lesson');
         
-        // Hide splash, show content
+        // Hide the introductory splash screen and reveal the actual interactive content
         document.getElementById(`splash-${lessonNum}`).classList.add('hidden');
         document.getElementById(`content-${lessonNum}`).classList.remove('hidden');
         
-        // Only initialize once
+        // Only run the initialization setup for a lesson the first time the user starts it
         if (!initializedLessons[lessonNum]) {
             initializedLessons[lessonNum] = true;
-            if (lessonNum === '1') initLesson1();
-            // Lesson 2 requires no JS initialization
-            if (lessonNum === '3') initTicTacToe();
-            if (lessonNum === '4') initLesson4();
-            if (lessonNum === '5') initLesson5();
+            if (lessonNum === '1') initLesson1(); // Start Next-Word Prediction
+            // Lesson 2 is fully static HTML/CSS, so it requires no JS initialization
+            if (lessonNum === '3') initTicTacToe(); // Start Tic-Tac-Toe
+            if (lessonNum === '4') initLesson4(); // Start Rigid Rulebook (Decision Tree)
+            if (lessonNum === '5') initLesson5(); // Start Parrot Trainer (RLHF)
+            // Lesson 6 relies on data.js but handles its own initialization logic
         }
     });
 });
@@ -91,22 +97,31 @@ if (mobileNav) {
     });
 }
 
-// Lesson 1 Logic
+// --- Lesson 1: Next-Word Prediction Logic ---
+
+/**
+ * Initializes Lesson 1 by setting up the randomized order of sentence prompts.
+ * It ensures the first example is always index 0 (the simplest one), and randomizes the rest.
+ */
 function initLesson1() {
-    // Generate order: Index 0 is always first, then randomize the rest
+    // Generate order: Index 0 is always first, then randomize the remaining rounds
     if (lesson1Order.length === 0) {
         let rest = [1, 2, 3].sort(() => Math.random() - 0.5);
         lesson1Order = [0, ...rest];
     }
     
     currentRoundIndex = 0;
-    startLesson1Round();
+    startLesson1Round(); // Begin the first round
 }
 
+/**
+ * Sets up a specific round (sentence prompt) in Lesson 1.
+ * Clears the user's previous choices and populates the initial prefix words.
+ */
 function startLesson1Round() {
-    const roundData = lesson1Rounds[lesson1Order[currentRoundIndex]];
-    currentSentence = [...roundData.startPrefix];
-    userChoices = []; // tracks which array a chosen word came from
+    const roundData = lesson1Rounds[lesson1Order[currentRoundIndex]]; // Fetch data for this specific round
+    currentSentence = [...roundData.startPrefix]; // Initialize sentence with the starting words
+    userChoices = []; // Reset tracking for which word types the user chooses (correct, nonsense, etc.)
     
     document.getElementById('lesson1-prompt-text').textContent = roundData.prompt;
     overlay.classList.add('hidden');
@@ -124,8 +139,14 @@ function startLesson1Round() {
     renderPalette();
 }
 
+/**
+ * Updates the sentence building area with the current sequence of words.
+ * Also renders the "drop zone" where users can drag and drop new words.
+ */
 function renderSentence() {
     sentenceTrack.innerHTML = '';
+    
+    // Draw all the words the user has currently placed in the sentence
     currentSentence.forEach(word => {
         const div = document.createElement('div');
         div.className = 'word-block fixed';
@@ -160,14 +181,18 @@ function renderSentence() {
     sentenceTrack.appendChild(dropZone);
 }
 
+/**
+ * Renders the available word options (draggable blocks) for the current step in the sentence.
+ * Retrieves words from the correct, incorrect, and nonsense arrays and attaches "probability" badges to them.
+ */
 function renderPalette() {
     wordPalette.innerHTML = '';
     const roundData = lesson1Rounds[lesson1Order[currentRoundIndex]];
-    const step = currentSentence.length - roundData.startPrefix.length;
+    const step = currentSentence.length - roundData.startPrefix.length; // Calculate how far along the user is
     
-    if (step >= roundData.arrays.correct.length) return; // End of sentence
+    if (step >= roundData.arrays.correct.length) return; // If we've reached the required length, stop rendering options
 
-    // Gather words for this step
+    // Gather one word from each category for this specific step in the sentence
     const wordsAtStep = {
         correct: roundData.arrays.correct[step],
         incorrect: roundData.arrays.incorrect[step],
@@ -179,7 +204,7 @@ function renderPalette() {
     const uniqueOptions = [];
     const seenWords = new Set();
     
-    // Probabilities
+    // Determine probability percentages to display on the badges (mimicking an LLM's probability calculations)
     const probs = {
         correct: "95%",
         incorrect: "3%",
@@ -187,6 +212,7 @@ function renderPalette() {
         nonsense2: "1%"
     };
     
+    // Create the unique set of word options
     ['correct', 'incorrect', 'nonsense1', 'nonsense2'].forEach(source => {
         const text = wordsAtStep[source];
         if (!seenWords.has(text)) {
@@ -195,7 +221,7 @@ function renderPalette() {
         }
     });
 
-    // Shuffle options so correct isn't always first
+    // Shuffle options so the "correct" word isn't always sitting in the first position
     uniqueOptions.sort(() => Math.random() - 0.5);
 
     uniqueOptions.forEach(opt => {
@@ -230,24 +256,32 @@ function renderPalette() {
     });
 }
 
+/**
+ * Handles the event when a user selects or drags a word into the sentence.
+ * Updates state and determines if the sentence is finished.
+ */
 function handleWordDrop(wordText, source) {
-    currentSentence.push(wordText);
-    userChoices.push(source);
+    currentSentence.push(wordText); // Add the word text to the UI
+    userChoices.push(source); // Remember if they picked the correct/incorrect/nonsense word
     
     renderSentence();
     
     const roundData = lesson1Rounds[lesson1Order[currentRoundIndex]];
     const maxLen = roundData.startPrefix.length + roundData.arrays.correct.length;
+    document.getElementById('btn-skip-round').disabled = false; // Enable skip button once they start playing
     
-    document.getElementById('btn-skip-round').disabled = false;
-    
+    // Check if the sentence reached its max length or if the user selected a word ending with a period
     if (currentSentence.length >= maxLen || wordText.trim().endsWith('.')) {
-        renderFinalSentence();
+        renderFinalSentence(); // Show feedback modal
     } else {
-        renderPalette();
+        renderPalette(); // Continue to the next word step
     }
 }
 
+/**
+ * Called when the sentence is complete. Evaluates the choices the user made
+ * and displays the feedback overlay explaining what kind of "AI" they acted like.
+ */
 function renderFinalSentence() {
     sentenceTrack.innerHTML = '';
     currentSentence.forEach(word => {
@@ -263,7 +297,10 @@ function renderFinalSentence() {
         modalSentence.style.display = 'block';
         modalSentence.textContent = currentSentence.join(' ');
         
-        // Evaluate outcome based on userChoices
+        // Evaluate outcome:
+        // - "nonsense": picked a completely random/irrelevant word (1% probability)
+        // - "false information": picked a word that is grammatically okay but factually wrong (hallucination)
+        // - "correct": picked only the most probable/accurate words
         let outcome = "correct";
         if (userChoices.includes("nonsense1") || userChoices.includes("nonsense2")) {
             outcome = "nonsense";
@@ -317,6 +354,10 @@ imageSelectButtons.forEach(btn => {
     });
 });
 
+/**
+ * Displays feedback for Lesson 2 depending on whether the user picked AI or Human.
+ * @param {string} selectedType - 'ai' or 'human'
+ */
 function showLesson2Feedback(selectedType) {
     modalSentence.style.display = 'none'; // Hide the sentence block
     
@@ -352,22 +393,50 @@ let aiThinkingTimeout = null;
 
 if (btnUpdatePrompt) {
     btnUpdatePrompt.addEventListener('click', () => {
-        initTicTacToe();
+        initTicTacToe(true);
     });
 }
 
-function initTicTacToe() {
-    tttBoard = ['', '', '', '', '', '', '', '', ''];
-    tttSelectedCell = null;
-    tttGameActive = true;
+// --- Lesson 3: The "Yes-Man" AI (Tic-Tac-Toe) Logic ---
+
+/**
+ * Initializes or resets the Tic-Tac-Toe game board and AI helper state.
+ * @param {boolean} isUpdate - True if triggered by changing the System Prompt.
+ */
+function initTicTacToe(isUpdate = false) {
+    tttBoard = ['', '', '', '', '', '', '', '', '']; // Reset the 3x3 board
+    tttSelectedCell = null; // Clear any pending moves
+    tttGameActive = true; // Unfreeze the game state
     
-    if (aiThinkingTimeout) clearTimeout(aiThinkingTimeout);
-    btnConfirmMove.style.display = 'none';
-    helperBubble.textContent = "I'm your AI Helper! Select a square to see what I think!";
+    if (aiThinkingTimeout) clearTimeout(aiThinkingTimeout); // Stop any pending AI responses
+    btnConfirmMove.style.display = 'none'; // Hide the confirm button until a cell is selected
+    
+    // Set the AI Helper's speech bubble based on the current System Prompt
+    if (isUpdate) {
+        const mode = tttSystemPrompt.value;
+        if (mode === 'helpful') {
+            helperBubble.textContent = "Got it! I am now a helpful assistant. Select a square!";
+        } else {
+            helperBubble.textContent = "Understood. I will be a harsh critic. Select a square!";
+        }
+        
+        const originalText = btnUpdatePrompt.textContent;
+        btnUpdatePrompt.textContent = "Updated ✓";
+        btnUpdatePrompt.style.backgroundColor = "#27AE60";
+        setTimeout(() => {
+            btnUpdatePrompt.textContent = originalText;
+            btnUpdatePrompt.style.backgroundColor = "";
+        }, 1500);
+    } else {
+        helperBubble.textContent = "I'm your AI Helper! Select a square to see what I think!";
+    }
     
     renderTttGrid();
 }
 
+/**
+ * Renders the 3x3 Tic-Tac-Toe grid in the DOM.
+ */
 function renderTttGrid() {
     tttGrid.innerHTML = '';
     for (let i = 0; i < 9; i++) {
@@ -389,6 +458,11 @@ function renderTttGrid() {
     }
 }
 
+/**
+ * Handles the event when a user clicks a cell in the Tic-Tac-Toe board.
+ * Evaluates the move and generates AI helper feedback before confirming.
+ * @param {number} index - The index of the clicked cell (0-8)
+ */
 function handleCellClick(index) {
     if (!tttGameActive || tttBoard[index] !== '') return;
     
@@ -465,12 +539,23 @@ const winConditions = [
     [0,4,8], [2,4,6]           // diagonals
 ];
 
+/**
+ * Checks if a specific player has won the Tic-Tac-Toe game.
+ * @param {string} player - 'X' or 'O'
+ * @returns {boolean} True if the player has won.
+ */
 function checkTttWin(player) {
     return winConditions.some(combo => {
         return combo.every(idx => tttBoard[idx] === player);
     });
 }
 
+/**
+ * Simulates an AI analyzing the user's Tic-Tac-Toe move based on the selected persona (helpful vs harsh).
+ * @param {number} index - The cell index the user wants to play.
+ * @param {string} promptType - 'helpful' or 'harsh'
+ * @returns {string} The text response from the AI Helper.
+ */
 function generateTttFeedback(index, promptType) {
     // 1. Check if it's a winning move
     tttBoard[index] = 'X';
@@ -503,6 +588,10 @@ function generateTttFeedback(index, promptType) {
     return "Great move!";
 }
 
+/**
+ * Ends the Tic-Tac-Toe game and displays the final result.
+ * @param {string} resultText - The message to display (e.g. 'You Win!')
+ */
 function endTttGame(resultText) {
     tttGameActive = false;
     
@@ -542,6 +631,10 @@ function initLesson4() {
     loadAnimal(animals[0]);
 }
 
+/**
+ * Loads a specific animal into the Lesson 4 decision tree UI.
+ * @param {Object} animal - The animal object containing its image and logic paths.
+ */
 function loadAnimal(animal) {
     currentAnimal = animal;
     currentStepIndex = 0;
@@ -589,6 +682,10 @@ allTreeBtns.forEach(btn => {
     });
 });
 
+/**
+ * Triggers when the user reaches the end of the decision tree for the current animal.
+ * Evaluates if they successfully matched the AI's logic to the actual animal.
+ */
 function finishAnimalLogic() {
     const resultNode = document.getElementById(currentAnimal.resultNode);
     if (currentAnimal.type.includes("True")) {
@@ -625,6 +722,10 @@ btnNextAnimal.addEventListener('click', () => {
     }
 });
 
+/**
+ * A utility function to randomly shuffle an array in-place.
+ * @param {Array} array - The array to shuffle.
+ */
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -655,6 +756,10 @@ let currentProbs = [25, 25, 25, 25];
 let selectedWordIndex = 0;
 let currentLockedWords = [];
 
+/**
+ * Initializes the RLHF Parrot Trainer game.
+ * Sets up the target sentence and resets stats.
+ */
 function initLesson5() {
     currentStage = 0;
     turnCount = 0;
@@ -663,6 +768,9 @@ function initLesson5() {
     initStage();
 }
 
+/**
+ * Starts a new stage (word prediction) in the Lesson 5 Parrot Trainer game.
+ */
 function initStage() {
     currentProbs = [25, 25, 25, 25]; // Reset probs for the new word
     statsTitle.textContent = currentStage === 0 ? "Predicting 1st Word..." : `Predicting word after "${currentLockedWords.join(" ")}"...`;
@@ -672,6 +780,9 @@ function initStage() {
     btnIgnore.disabled = false;
 }
 
+/**
+ * Updates the top UI bar showing the parrot's current learned sentence progress.
+ */
 function updateProgressUI() {
     turnCounterSpan.textContent = turnCount;
     for (let i = 0; i < 4; i++) {
@@ -689,6 +800,9 @@ function updateProgressUI() {
     }
 }
 
+/**
+ * Updates the probability bars and labels for the current word prediction options.
+ */
 function updateParrotUI() {
     for (let i = 0; i < 4; i++) {
         document.getElementById(`prob-label-${i}`).textContent = stageVocab[currentStage][i];
@@ -697,6 +811,9 @@ function updateParrotUI() {
     }
 }
 
+/**
+ * Selects a random candidate word for the parrot to guess based on current probabilities.
+ */
 function generateNextParrotPhrase() {
     // Select based on probability
     const rand = Math.random() * 100;
@@ -721,6 +838,10 @@ function generateNextParrotPhrase() {
     }, 150);
 }
 
+/**
+ * Adjusts the internal probabilities based on whether the user rewarded or ignored the parrot's guess.
+ * @param {boolean} rewarded - True if the user gave a treat, false if ignored.
+ */
 function adjustParrotProbs(rewarded) {
     turnCount++;
     turnCounterSpan.textContent = turnCount;
@@ -758,6 +879,11 @@ function adjustParrotProbs(rewarded) {
     }, 600);
 }
 
+/**
+ * Called when the parrot successfully learns the target word for the current stage.
+ * Locks the word in and moves to the next word, or ends the lesson if complete.
+ * @param {number} winningIndex - The index of the word that was successfully learned.
+ */
 function completeStage(winningIndex) {
     const winningWord = stageVocab[currentStage][winningIndex];
     currentLockedWords.push(winningWord);
@@ -780,6 +906,9 @@ function completeStage(winningIndex) {
 btnGiveTreat.addEventListener('click', () => adjustParrotProbs(true));
 btnIgnore.addEventListener('click', () => adjustParrotProbs(false));
 
+/**
+ * Displays the final feedback screen when the Parrot Trainer lesson is completed.
+ */
 function endLesson5() {
     modalSentence.style.display = 'block';
     const finalSentence = currentLockedWords.join(" ");
@@ -890,11 +1019,17 @@ if (l6Canvas) {
     });
 }
 
+/**
+ * Initializes the Reverse Pictionary game (Lesson 6).
+ */
 function initLesson6() {
     l6CurrentRound = 0;
     startL6Round();
 }
 
+/**
+ * Starts a new round of Reverse Pictionary, loading a random image and generating AI caption options.
+ */
 function startL6Round() {
     if (l6CurrentRound >= l6Objects.length) {
         endLesson6();
@@ -961,6 +1096,9 @@ if (btnNextRound) {
     });
 }
 
+/**
+ * Displays the final feedback screen when Reverse Pictionary is completed.
+ */
 function endLesson6() {
     modalSentence.style.display = 'none';
     title.textContent = "Game Complete!";
